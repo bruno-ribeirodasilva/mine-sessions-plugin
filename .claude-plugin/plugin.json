@@ -1,0 +1,5 @@
+{
+  "name": "mine-sessions",
+  "description": "Analyze Claude Code session transcripts to find workflow patterns, friction points, and setup improvements. Works for any role.",
+  "version": "1.0.0"
+}
