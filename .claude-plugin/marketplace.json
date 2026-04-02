@@ -11,7 +11,11 @@
       "name": "mine-sessions",
       "description": "Analyze Claude Code session transcripts for workflow patterns, friction points, and setup improvements",
       "category": "productivity",
-      "source": "."
+      "source": {
+        "source": "url",
+        "url": "https://github.com/bruno-ribeirodasilva/mine-sessions-plugin.git",
+        "sha": "fc145460619282c9cbfe2c91990e4b3466e8e60e"
+      }
     }
   ]
 }
