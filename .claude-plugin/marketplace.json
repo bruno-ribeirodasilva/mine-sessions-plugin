@@ -1,0 +1,10 @@
+{
+  "plugins": [
+    {
+      "name": "mine-sessions",
+      "description": "Analyze Claude Code session transcripts for workflow patterns, friction points, and setup improvements",
+      "version": "1.0.0",
+      "path": "."
+    }
+  ]
+}
