@@ -38,24 +38,23 @@ Note: `mine_sessions.py` and `filter_transcript.py` must be at `scripts/` in the
 
 ```bash
 mkdir -p "$OUTPUT_DIR/filtered"
-PROJECT_DIR=$(python3 -c "
+
+# Iterate ALL project dirs — not just the biggest one
+for PROJECT_DIR in $(python3 -c "
 import os
 base = os.path.expanduser('~/.claude/projects')
-best, best_n = '', 0
 for d in os.listdir(base):
     dp = os.path.join(base, d)
-    if os.path.isdir(dp):
-        n = sum(1 for f in os.listdir(dp) if f.endswith('.jsonl'))
-        if n > best_n: best, best_n = dp, n
-print(best)
-")
-
-for f in "$PROJECT_DIR"/*.jsonl; do
-  fname=$(basename "$f" .jsonl)
-  out="$OUTPUT_DIR/filtered/${fname}.txt"
-  python3 scripts/filter_transcript.py "$f" > "$out" 2>/dev/null || \
-  python3 ~/.claude/scripts/filter_transcript.py "$f" > "$out" 2>/dev/null
-  [ $(wc -c < "$out" | tr -d ' ') -lt 500 ] && rm "$out"
+    if os.path.isdir(dp) and any(f.endswith('.jsonl') for f in os.listdir(dp)):
+        print(dp)
+"); do
+  for f in "$PROJECT_DIR"/*.jsonl; do
+    fname=$(basename "$f" .jsonl)
+    out="$OUTPUT_DIR/filtered/${fname}.txt"
+    python3 scripts/filter_transcript.py "$f" > "$out" 2>/dev/null || \
+    python3 ~/.claude/scripts/filter_transcript.py "$f" > "$out" 2>/dev/null
+    [ $(wc -c < "$out" | tr -d ' ') -lt 500 ] && rm "$out"
+  done
 done
 ```
 

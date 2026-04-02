@@ -5,8 +5,8 @@ Usage:
   python3 mine_sessions.py [--project-dir DIR] [--json] [--dashboard] [--verbose]
 
 Options:
-  --project-dir DIR   Directory containing JSONL transcripts
-                      (default: ~/.claude/projects/-Users-taxfix-projects-data-dbt-models/)
+  --project-dir DIR   Directory containing JSONL transcripts (scans only this dir).
+                      When omitted, scans ALL project dirs under ~/.claude/projects/.
   --json              Output sessions.json and analysis.json only
   --dashboard         Generate dashboard.html
   --verbose           Print per-session details to stdout
@@ -1006,24 +1006,19 @@ def main():
     parser.add_argument("--verbose", action="store_true", help="Print per-session details")
     args = parser.parse_args()
 
-    # Default project dir
+    # Resolve project dirs to scan
     if args.project_dir:
-        project_dir = args.project_dir
+        project_dirs = [args.project_dir]
     else:
-        # Find the largest project dir
+        # Scan ALL project dirs under ~/.claude/projects/
         base = os.path.expanduser("~/.claude/projects")
         if os.path.isdir(base):
-            candidates = []
+            project_dirs = []
             for d in os.listdir(base):
                 dp = os.path.join(base, d)
-                if os.path.isdir(dp):
-                    jsonl_count = sum(1 for f in os.listdir(dp) if f.endswith(".jsonl"))
-                    if jsonl_count > 0:
-                        candidates.append((jsonl_count, dp))
-            candidates.sort(reverse=True)
-            if candidates:
-                project_dir = candidates[0][1]
-            else:
+                if os.path.isdir(dp) and any(f.endswith(".jsonl") for f in os.listdir(dp)):
+                    project_dirs.append(dp)
+            if not project_dirs:
                 print("No JSONL transcripts found in ~/.claude/projects/")
                 sys.exit(1)
         else:
@@ -1034,15 +1029,16 @@ def main():
     output_dir = args.output_dir or os.path.expanduser("~/.claude/session_analysis")
     os.makedirs(output_dir, exist_ok=True)
 
-    # Find all JSONL files
+    # Find all JSONL files across all project dirs
     jsonl_files = []
-    for f in os.listdir(project_dir):
-        if f.endswith(".jsonl"):
-            fp = os.path.join(project_dir, f)
-            jsonl_files.append(fp)
+    for project_dir in project_dirs:
+        for f in os.listdir(project_dir):
+            if f.endswith(".jsonl"):
+                fp = os.path.join(project_dir, f)
+                jsonl_files.append(fp)
     jsonl_files.sort(key=lambda x: os.path.getmtime(x))
 
-    print(f"Found {len(jsonl_files)} transcript files in {project_dir}")
+    print(f"Found {len(jsonl_files)} transcript files across {len(project_dirs)} project(s)")
 
     # Parse all sessions
     sessions = []
