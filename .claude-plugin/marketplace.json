@@ -1,10 +1,17 @@
 {
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "mine-sessions-marketplace",
+  "description": "Session transcript analysis for Claude Code",
+  "owner": {
+    "name": "Bruno Ribeiro da Silva",
+    "email": "bruno@taxfix.de"
+  },
   "plugins": [
     {
       "name": "mine-sessions",
       "description": "Analyze Claude Code session transcripts for workflow patterns, friction points, and setup improvements",
-      "version": "1.0.0",
-      "path": "."
+      "category": "productivity",
+      "source": "."
     }
   ]
 }
